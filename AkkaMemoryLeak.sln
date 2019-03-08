@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26124.0
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaMemoryLeak", "src\AkkaMemoryLeak\AkkaMemoryLeak.csproj", "{B5379BF3-F8A6-4158-92C7-D5A38A41F079}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Debug|x64.Build.0 = Debug|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Debug|x86.Build.0 = Debug|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Release|x64.ActiveCfg = Release|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Release|x64.Build.0 = Release|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Release|x86.ActiveCfg = Release|Any CPU
+		{B5379BF3-F8A6-4158-92C7-D5A38A41F079}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5D6324C3-466B-43B8-83CC-FC14318B06AC}
+	EndGlobalSection
+EndGlobal
