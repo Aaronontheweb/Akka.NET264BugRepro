@@ -1,5 +1,6 @@
 ﻿using System;
 using Akka.Actor;
+using Akka.Cluster;
 using Akka.Configuration;
 
 namespace AkkaMemoryLeak
@@ -13,7 +14,7 @@ namespace AkkaMemoryLeak
 
         private static void TestForMemoryLeak(Action action)
         {
-            const int iterationCount = 100;
+            const int iterationCount = 1000;
             const long memoryThreshold = 10 * 1024 * 1024;
 
             action();
@@ -42,7 +43,18 @@ namespace AkkaMemoryLeak
 
         private const string ConfigStringCluster = @"
 akka {   
+    stdout-loglevel: DEBUG
+    loglevel: DEBUG
+    log-config-on-start: on
+
+    loggers = [""Akka.Event.StandardOutLogger, Akka""]
     actor {
+        debug {
+            autoreceive: on
+            lifecycle: on
+            unhandled: on
+            router-misconfiguration: on
+        }
         provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
     }
     remote {
@@ -70,18 +82,22 @@ akka {
             ActorSystem system;
 
             if (configString == null)
-                system = ActorSystem.Create("Local");
+                system = ActorSystem.Create("ClusterServer");
             else
             {
                 var config = ConfigurationFactory.ParseString(configString);
-                system = ActorSystem.Create("Local", config);
+                system = ActorSystem.Create("ClusterServer", config);
             }
 
-            // ensure that a actor system did some work
-            var actor = system.ActorOf(Props.Create(() => new MyActor()));
-            var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
+            Cluster.Get(system).RegisterOnMemberUp(() =>
+            {
+                // ensure that a actor system did some work
+                var actor = system.ActorOf(Props.Create(() => new MyActor()));
+                var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
+                system.Terminate();
+            });
 
-            system.Terminate().Wait();
+            system.WhenTerminated.Wait();
             system.Dispose();
         }
     }
