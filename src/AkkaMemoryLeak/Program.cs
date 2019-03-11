@@ -55,7 +55,7 @@ akka {
             unhandled: on
             router-misconfiguration: on
         }
-        provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
+        #provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
     }
     remote {
         helios.tcp {
@@ -89,13 +89,13 @@ akka {
                 system = ActorSystem.Create("ClusterServer", config);
             }
 
-            Cluster.Get(system).RegisterOnMemberUp(() =>
-            {
+            //Cluster.Get(system).RegisterOnMemberUp(() =>
+            //{
                 // ensure that a actor system did some work
                 var actor = system.ActorOf(Props.Create(() => new MyActor()));
                 var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
                 system.Terminate();
-            });
+            //});
 
             system.WhenTerminated.Wait();
             system.Dispose();
