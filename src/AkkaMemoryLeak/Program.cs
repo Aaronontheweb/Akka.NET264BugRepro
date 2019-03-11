@@ -50,13 +50,14 @@ akka {
 
     loggers = [""Akka.Event.StandardOutLogger, Akka""]
     actor {
+        default-dispatcher.shutdown-timeout = 0s
         debug {
             autoreceive: on
             lifecycle: on
             unhandled: on
             router-misconfiguration: on
         }
-        #provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
+        provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
     }
     remote {
         helios.tcp {
@@ -66,7 +67,12 @@ akka {
     }
     cluster {
         seed-nodes = [""akka.tcp://ClusterServer@127.0.0.1:3000""]
-    }  
+    } 
+    akka.persistence.dispatchers{
+        default-plugin-dispatcher = ""akka.actor.default-dispatcher""
+        default-replay-dispatcher = ""akka.actor.default-dispatcher""
+        default-stream-dispatcher = ""akka.actor.default-dispatcher""
+    }
 }
 ";
 
@@ -92,13 +98,13 @@ akka {
                 system = ActorSystem.Create("ClusterServer", config);
             }
 
-            //Cluster.Get(system).RegisterOnMemberUp(() =>
-            //{
+            Cluster.Get(system).RegisterOnMemberUp(() =>
+            {
                 // ensure that a actor system did some work
                 var actor = system.ActorOf(Props.Create(() => new MyActor()));
                 var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
                 system.Terminate();
-            //});
+            });
 
             system.WhenTerminated.Wait();
             system.Dispose();
