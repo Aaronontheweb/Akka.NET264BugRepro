@@ -96,7 +96,7 @@ akka {
 
             var actor = system.ActorOf(Props.Create(() => new MyActor()));
             TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-            system.Scheduler.Advanced.ScheduleOnce(TimeSpan.FromMilliseconds(10), () =>
+            system.Scheduler.Advanced.ScheduleRepeatedly(TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(100), () =>
             {
                 var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
                 tcs.SetResult(true);
