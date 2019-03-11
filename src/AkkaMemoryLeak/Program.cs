@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Cluster;
 using Akka.Configuration;
@@ -77,7 +78,7 @@ akka {
             }
         }
 
-    private static void CreateAndDisposeActorSystem(string configString)
+        private static void CreateAndDisposeActorSystem(string configString)
         {
             ActorSystem system;
 
@@ -91,10 +92,18 @@ akka {
 
             //Cluster.Get(system).RegisterOnMemberUp(() =>
             //{
-                // ensure that a actor system did some work
-                var actor = system.ActorOf(Props.Create(() => new MyActor()));
+            // ensure that a actor system did some work
+
+            var actor = system.ActorOf(Props.Create(() => new MyActor()));
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            system.Scheduler.Advanced.ScheduleOnce(TimeSpan.FromMilliseconds(10), () =>
+            {
                 var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
-                system.Terminate();
+                tcs.SetResult(true);
+            });
+
+            tcs.Task.Wait();
+            system.Terminate();
             //});
 
             system.WhenTerminated.Wait();
