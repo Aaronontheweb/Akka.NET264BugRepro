@@ -20,19 +20,19 @@ namespace AkkaMemoryLeak
             action();
             var memoryAfterFirstRun = GC.GetTotalMemory(true);
             Console.WriteLine($"After first run - MemoryUsage: {memoryAfterFirstRun}");
-
+            var currentMemory = GC.GetTotalMemory(true);
             for (var i = 1; i <= iterationCount; i++)
             {
                 action();
 
                 if (i % 10 == 0)
                 {
-                    var currentMemory = GC.GetTotalMemory(true);
+                    currentMemory = GC.GetTotalMemory(true);
                     Console.WriteLine($"Iteration: {i} - MemoryUsage: {currentMemory}");
-
-                    if (currentMemory > memoryAfterFirstRun + memoryThreshold)
-                        throw new InvalidOperationException("There seems to be a memory leak!");
                 }
+
+                if (currentMemory > memoryAfterFirstRun + memoryThreshold)
+                    throw new InvalidOperationException("There seems to be a memory leak!");
             }
         }
 
