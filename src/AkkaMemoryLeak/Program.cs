@@ -2,6 +2,7 @@
 using Akka.Actor;
 using Akka.Cluster;
 using Akka.Configuration;
+using Akka.Persistence;
 
 namespace AkkaMemoryLeak
 {
@@ -55,7 +56,7 @@ akka {
             unhandled: on
             router-misconfiguration: on
         }
-        provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
+        #provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
     }
     remote {
         helios.tcp {
@@ -69,12 +70,14 @@ akka {
 }
 ";
 
-        class MyActor : ReceiveActor
+        class MyActor : ReceivePersistentActor
         {
             public MyActor()
             {
-                ReceiveAny(_ => Sender.Tell(_));
+                CommandAny(_ => Sender.Tell(_));
             }
+
+            public override string PersistenceId => Context.Self.Path.Name;
         }
 
     private static void CreateAndDisposeActorSystem(string configString)
@@ -89,13 +92,13 @@ akka {
                 system = ActorSystem.Create("ClusterServer", config);
             }
 
-            Cluster.Get(system).RegisterOnMemberUp(() =>
-            {
+            //Cluster.Get(system).RegisterOnMemberUp(() =>
+            //{
                 // ensure that a actor system did some work
                 var actor = system.ActorOf(Props.Create(() => new MyActor()));
                 var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
                 system.Terminate();
-            });
+            //});
 
             system.WhenTerminated.Wait();
             system.Dispose();
