@@ -2,6 +2,7 @@
 using Akka.Actor;
 using Akka.Cluster;
 using Akka.Configuration;
+using Akka.Persistence;
 
 namespace AkkaMemoryLeak
 {
@@ -69,12 +70,14 @@ akka {
 }
 ";
 
-        class MyActor : ReceiveActor
+        class MyActor : ReceivePersistentActor
         {
             public MyActor()
             {
-                ReceiveAny(_ => Sender.Tell(_));
+                CommandAny(_ => Sender.Tell(_));
             }
+
+            public override string PersistenceId => Context.Self.Path.Name;
         }
 
     private static void CreateAndDisposeActorSystem(string configString)
