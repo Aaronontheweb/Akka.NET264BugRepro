@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Cluster;
 using Akka.Configuration;
@@ -55,7 +56,7 @@ akka {
             unhandled: on
             router-misconfiguration: on
         }
-        provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
+        #provider = ""Akka.Cluster.ClusterActorRefProvider, Akka.Cluster""
     }
     remote {
         helios.tcp {
@@ -77,7 +78,7 @@ akka {
             }
         }
 
-    private static void CreateAndDisposeActorSystem(string configString)
+        private static void CreateAndDisposeActorSystem(string configString)
         {
             ActorSystem system;
 
@@ -89,13 +90,21 @@ akka {
                 system = ActorSystem.Create("ClusterServer", config);
             }
 
-            Cluster.Get(system).RegisterOnMemberUp(() =>
+            //Cluster.Get(system).RegisterOnMemberUp(() =>
+            //{
+            // ensure that a actor system did some work
+
+            var actor = system.ActorOf(Props.Create(() => new MyActor()));
+            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            system.Scheduler.Advanced.ScheduleRepeatedly(TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(100), () =>
             {
-                // ensure that a actor system did some work
-                var actor = system.ActorOf(Props.Create(() => new MyActor()));
                 var result = actor.Ask<ActorIdentity>(new Identify(42)).Result;
-                system.Terminate();
+                tcs.SetResult(true);
             });
+
+            tcs.Task.Wait();
+            system.Terminate();
+            //});
 
             system.WhenTerminated.Wait();
             system.Dispose();
